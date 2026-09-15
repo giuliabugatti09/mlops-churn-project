@@ -31,6 +31,14 @@ def predict(features: ChurnFeatures):
     """Recebe as features de um cliente e retorna a predição de churn."""
     input_df = pd.DataFrame([features.model_dump()])
 
+    # Reordena as colunas para bater exatamente com a ordem do treino
+    if hasattr(model, "feature_names_in_"):
+        input_df = input_df[model.feature_names_in_]
+    elif hasattr(model, "steps"):  # Tratamento para Pipeline do scikit-learn
+        first_step = model.steps[0][1]
+        if hasattr(first_step, "feature_names_in_"):
+            input_df = input_df[first_step.feature_names_in_]
+
     prediction = model.predict(input_df)[0]
     probability = model.predict_proba(input_df)[0][1]
 

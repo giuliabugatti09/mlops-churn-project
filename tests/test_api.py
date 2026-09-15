@@ -17,15 +17,14 @@ def test_model_info_returns_expected_fields():
     assert response.status_code == 200
     body = response.json()
     assert body["name"] == "churn-classifier"
-    assert body["stage"] == "Staging"
-
+    assert body["stage"] == "Production"
 
 def test_predict_returns_valid_prediction():
     payload = {
+        "SeniorCitizen": 0,
         "tenure": 12,
         "MonthlyCharges": 70.5,
         "TotalCharges": 845.0,
-        "SeniorCitizen": 0,
     }
     response = client.post("/predict", json=payload)
     assert response.status_code == 200
@@ -39,10 +38,10 @@ def test_predict_rejects_invalid_payload():
     ser rejeitados pela validação automática do Pydantic.
     """
     payload = {
+        "SeniorCitizen": 5,
         "tenure": 12,
         "MonthlyCharges": 70.5,
         "TotalCharges": 845.0,
-        "SeniorCitizen": 5,
     }
     response = client.post("/predict", json=payload)
     assert response.status_code == 422

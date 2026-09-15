@@ -8,8 +8,7 @@ from mlflow import MlflowClient
 
 MLFLOW_TRACKING_URI = "sqlite:///mlflow.db"
 MODEL_NAME = "churn-classifier"
-MODEL_STAGE = "Staging"
-
+MODEL_STAGE = "Production"
 
 def load_model():
     """Carrega o pipeline (scaler + classificador) do Registry."""
