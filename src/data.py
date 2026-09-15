@@ -6,8 +6,6 @@ tratados exatamente da mesma forma nos dois contextos.
 """
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-
 TARGET_COLUMN = "Churn"
 
 
@@ -39,21 +37,14 @@ def split_features_target(df: pd.DataFrame):
     y = df[TARGET_COLUMN]
     return X, y
 
-
 def prepare_train_test(df: pd.DataFrame, test_size: float = 0.2, random_state: int = 42):
-    """Executa o split treino/teste e escala as features.
-
-    Retorna também o scaler ajustado, pois ele precisa ser salvo
-    junto com o modelo — a API vai precisar dele para transformar
-    novas requisições da mesma forma.
+    """Executa o split treino/teste. A escala das features agora
+    faz parte do Pipeline do modelo (ver train.py), não deste módulo —
+    isso evita divergência entre o pré-processamento do treino e o
+    da API de inferência.
     """
     X, y = split_features_target(df)
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=test_size, random_state=random_state, stratify=y
     )
-
-    scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
-
-    return X_train_scaled, X_test_scaled, y_train, y_test, scaler
+    return X_train, X_test, y_train, y_test
