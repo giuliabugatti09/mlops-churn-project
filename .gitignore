@@ -33,3 +33,5 @@ Thumbs.db
 
 # Notebooks — checkpoints do Jupyter
 .ipynb_checkpoints/
+
+mlflow.db
