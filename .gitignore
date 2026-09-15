@@ -1,0 +1,35 @@
+# Ambiente virtual
+venv/
+.venv/
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# Variáveis de ambiente e segredos
+.env
+*.env.local
+
+# Dados (opcional — se o dataset for pequeno, pode versionar; se for grande, ignore)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Notebooks — checkpoints do Jupyter
+.ipynb_checkpoints/
