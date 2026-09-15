@@ -1,50 +1,41 @@
-import pandas as pd
+"""Orquestra o pipeline de treino: carrega dados, treina o modelo
+e loga tudo no MLflow. Não implementa lógica de pré-processamento
+ou de métricas diretamente — isso vive em data.py e evaluate.py.
+"""
 import mlflow
 import mlflow.sklearn
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 
-# Aponta o MLflow para o mesmo backend que subimos no terminal
-mlflow.set_tracking_uri("sqlite:///mlflow.db")
-mlflow.set_experiment("churn-baseline")
+from src.data import load_raw_data, clean_data, prepare_train_test
+from src.evaluate import compute_metrics
 
-# Carrega os dados (ajuste o nome do arquivo conforme o seu CSV)
-df = pd.read_csv("data/raw/telco_churn.csv")
+DATA_PATH = "data/raw/telco_churn.csv"
+EXPERIMENT_NAME = "churn-baseline"
 
-# Pré-processamento mínimo só para o baseline rodar
-df = df.dropna()
-df["Churn"] = df["Churn"].map({"Yes": 1, "No": 0})
-X = df.select_dtypes(include=["int64", "float64"]).drop(columns=["Churn"])
-y = df["Churn"]
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
-)
+def run_training(max_iter: int = 1000, run_name: str = "logistic-regression"):
+    mlflow.set_tracking_uri("sqlite:///mlflow.db")
+    mlflow.set_experiment(EXPERIMENT_NAME)
 
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
+    df = load_raw_data(DATA_PATH)
+    df = clean_data(df)
+    X_train, X_test, y_train, y_test, scaler = prepare_train_test(df)
 
-with mlflow.start_run(run_name="logistic-regression-baseline"):
-    max_iter = 200
-    model = LogisticRegression(max_iter=max_iter, random_state=42)
-    model.fit(X_train_scaled, y_train)
+    with mlflow.start_run(run_name=run_name):
+        model = LogisticRegression(max_iter=max_iter, random_state=42)
+        model.fit(X_train, y_train)
 
-    y_pred = model.predict(X_test_scaled)
-    y_proba = model.predict_proba(X_test_scaled)[:, 1]
+        y_pred = model.predict(X_test)
+        y_proba = model.predict_proba(X_test)[:, 1]
+        metrics = compute_metrics(y_test, y_pred, y_proba)
 
-    # Loga os hiperparâmetros
-    mlflow.log_param("model_type", "LogisticRegression")
-    mlflow.log_param("max_iter", max_iter)
+        mlflow.log_param("model_type", "LogisticRegression")
+        mlflow.log_param("max_iter", max_iter)
+        mlflow.log_metrics(metrics)
+        mlflow.sklearn.log_model(model, "model")
 
-    # Loga as métricas
-    mlflow.log_metric("accuracy", accuracy_score(y_test, y_pred))
-    mlflow.log_metric("f1_score", f1_score(y_test, y_pred))
-    mlflow.log_metric("roc_auc", roc_auc_score(y_test, y_proba))
+        print(f"Run finalizado — métricas: {metrics}")
 
-    # Loga o modelo como artefato
-    mlflow.sklearn.log_model(model, "model")
 
-    print("Run finalizado. Confira em http://127.0.0.1:5000")
+if __name__ == "__main__":
+    run_training()
