@@ -1,0 +1,26 @@
+artifact_path: model
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.10
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.5.1
+mlflow_version: 2.16.0
+model_size_bytes: 1344
+model_uuid: 801b5272f3ca4134b3a9b3b43fffb737
+run_id: a02e2bededcb4be79e496b01eb7871a8
+signature:
+  inputs: '[{"type": "long", "name": "SeniorCitizen", "required": true}, {"type":
+    "long", "name": "tenure", "required": true}, {"type": "double", "name": "MonthlyCharges",
+    "required": true}, {"type": "double", "name": "TotalCharges", "required": true}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "int64", "shape": [-1]}}]'
+  params: null
+utc_time_created: '2026-09-15 12:44:32.399354'
