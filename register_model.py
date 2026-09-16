@@ -3,7 +3,7 @@ no MLflow Model Registry, a partir de um run já existente.
 """
 import mlflow
 
-RUN_ID = "f163b061e3eb4e54a1d9ce840eaefa3f"
+RUN_ID = "80a3550b39654e8fb4825a685140f411"
 MODEL_NAME = "churn-classifier"
 
 mlflow.set_tracking_uri("sqlite:///mlflow.db")

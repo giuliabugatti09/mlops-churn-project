@@ -8,6 +8,10 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 TARGET_COLUMN = "Churn"
 
+# Fonte única da verdade para a ordem das features — tanto o treino
+# quanto a API devem montar o DataFrame de entrada usando esta mesma
+# lista, na mesma ordem, para evitar divergência entre os dois.
+FEATURE_COLUMNS = ["tenure", "MonthlyCharges", "TotalCharges", "SeniorCitizen"]
 
 def load_raw_data(path: str) -> pd.DataFrame:
     """Carrega o CSV bruto do disco."""
@@ -28,15 +32,14 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def split_features_target(df: pd.DataFrame):
-    """Separa features numéricas do target.
-
-    Por enquanto só features numéricas (baseline). Colunas
-    categóricas entram em uma iteração futura do pipeline.
+    """Separa features numéricas do target, na ordem definida por
+    FEATURE_COLUMNS. Forçar essa ordem aqui garante que o modelo
+    seja sempre treinado com o mesmo layout de colunas que a API
+    usará para montar o DataFrame de inferência.
     """
-    X = df.select_dtypes(include=["int64", "float64"]).drop(columns=[TARGET_COLUMN])
+    X = df[FEATURE_COLUMNS]
     y = df[TARGET_COLUMN]
     return X, y
-
 
 def prepare_train_test(df: pd.DataFrame, test_size: float = 0.2, random_state: int = 42):
     """Executa o split treino/teste. A escala das features agora

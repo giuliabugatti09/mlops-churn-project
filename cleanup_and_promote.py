@@ -1,24 +1,22 @@
-"""Arquiva a versão antiga do modelo e promove a versão correta
-(com Pipeline completo) para Production.
+"""Arquiva a versão anterior e promove a nova versão (com
+FEATURE_COLUMNS centralizado) para Production.
 """
 from mlflow import MlflowClient
 
 client = MlflowClient(tracking_uri="sqlite:///mlflow.db")
 
-# Versão 1 é o modelo antigo, sem o scaler embutido no Pipeline —
-# arquivamos para deixar claro que não é mais candidata a uso.
-client.transition_model_version_stage(
-    name="churn-classifier",
-    version=1,
-    stage="Archived",
-)
-print("Versao 1 arquivada")
-
-# Versão 2 é o Pipeline completo (scaler + classificador), já
-# validado pela API e pelos testes automatizados.
+# Versão 2 era o Pipeline anterior, sem a ordem de features centralizada.
 client.transition_model_version_stage(
     name="churn-classifier",
     version=2,
+    stage="Archived",
+)
+print("Versao 2 arquivada")
+
+# Versão 3 é a atual, com FEATURE_COLUMNS como fonte única da verdade.
+client.transition_model_version_stage(
+    name="churn-classifier",
+    version=3,
     stage="Production",
 )
-print("Versao 2 promovida para Production")
+print("Versao 3 promovida para Production")

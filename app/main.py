@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from app.schemas import ChurnFeatures, PredictionResponse
 from app.model_loader import load_model, get_model_info
+from src.data import FEATURE_COLUMNS
 
 app = FastAPI(
     title="Churn Prediction API",
@@ -25,19 +26,10 @@ def model_info():
     """Expõe metadados do modelo atualmente carregado, para rastreabilidade."""
     return get_model_info()
 
-
 @app.post("/predict", response_model=PredictionResponse)
 def predict(features: ChurnFeatures):
     """Recebe as features de um cliente e retorna a predição de churn."""
-    input_df = pd.DataFrame([features.model_dump()])
-
-    # Reordena as colunas para bater exatamente com a ordem do treino
-    if hasattr(model, "feature_names_in_"):
-        input_df = input_df[model.feature_names_in_]
-    elif hasattr(model, "steps"):  # Tratamento para Pipeline do scikit-learn
-        first_step = model.steps[0][1]
-        if hasattr(first_step, "feature_names_in_"):
-            input_df = input_df[first_step.feature_names_in_]
+    input_df = pd.DataFrame([features.model_dump()])[FEATURE_COLUMNS]
 
     prediction = model.predict(input_df)[0]
     probability = model.predict_proba(input_df)[0][1]
@@ -46,3 +38,5 @@ def predict(features: ChurnFeatures):
         churn_prediction=int(prediction),
         churn_probability=float(probability),
     )
+
+
