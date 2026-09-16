@@ -37,6 +37,7 @@ def split_features_target(df: pd.DataFrame):
     y = df[TARGET_COLUMN]
     return X, y
 
+
 def prepare_train_test(df: pd.DataFrame, test_size: float = 0.2, random_state: int = 42):
     """Executa o split treino/teste. A escala das features agora
     faz parte do Pipeline do modelo (ver train.py), não deste módulo —

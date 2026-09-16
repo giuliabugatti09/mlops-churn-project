@@ -10,6 +10,7 @@ MLFLOW_TRACKING_URI = "sqlite:///mlflow.db"
 MODEL_NAME = "churn-classifier"
 MODEL_STAGE = "Production"
 
+
 def load_model():
     """Carrega o pipeline (scaler + classificador) do Registry."""
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
