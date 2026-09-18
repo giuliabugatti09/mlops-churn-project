@@ -135,7 +135,7 @@ uvicorn app.main:app --reload --port 8000
 Every push to `main` that passes CI publishes a new image to GHCR:
 
 ```bash
-docker pull ghcr.io/<your-username>/churn-api:latest
+docker pull ghcr.io/giuliabugatti09/churn-api:latest
 docker run -p 8000:8000 ghcr.io/<your-username>/churn-api:latest
 ```
 
